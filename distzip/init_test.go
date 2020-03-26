@@ -14,13 +14,19 @@
  * limitations under the License.
  */
 
-package main
+package distzip_test
 
 import (
-	"github.com/paketo-buildpacks/dist-zip/distzip"
-	"github.com/paketo-buildpacks/libpak"
+	"testing"
+
+	"github.com/sclevine/spec"
+	"github.com/sclevine/spec/report"
 )
 
-func main() {
-	libpak.Detect(distzip.Detect{})
+func TestUnit(t *testing.T) {
+	suite := spec.New("distzip", spec.Report(report.Terminal{}))
+	suite("Build", testBuild)
+	suite("Detect", testDetect)
+	suite("ScriptResolver", testScriptResolver)
+	suite.Run(t)
 }
