@@ -4,7 +4,7 @@ The Paketo DistZip Buildpack is a Cloud Native Buildpack that contributes a Proc
 ## Behavior
 This buildpack will participate all of the following conditions are met
 
-* <APPLICATION_ROOT>/*/bin/* exists
+* `<APPLICATION_ROOT>/*/bin/*` exists
 
 The buildpack will do the following:
 
