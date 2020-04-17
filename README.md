@@ -1,4 +1,4 @@
-# `paketo-buildpacks/dist-zip`
+# `gcr.io/paketo-buildpacks/dist-zip`
 The Paketo DistZip Buildpack is a Cloud Native Buildpack that contributes a Process Type for DistZip-style applications.
 
 ## Behavior
