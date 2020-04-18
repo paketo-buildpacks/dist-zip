@@ -17,8 +17,6 @@
 package distzip
 
 import (
-	"fmt"
-
 	"github.com/buildpacks/libcnb"
 )
 
@@ -38,9 +36,7 @@ func (Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) 
 	}
 
 	sr := ScriptResolver{ApplicationPath: context.Application.Path}
-	if _, ok, err := sr.Resolve(); err != nil {
-		return libcnb.DetectResult{}, fmt.Errorf("unable to detect application scripts\n%w", err)
-	} else if ok {
+	if _, ok, _ := sr.Resolve(); ok {
 		result.Plans[0].Provides = append(result.Plans[0].Provides, libcnb.BuildPlanProvide{Name: "jvm-application"})
 	}
 
