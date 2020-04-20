@@ -41,13 +41,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	b.Logger.Title(context.Buildpack)
 	b.Logger.Body(bard.FormatUserConfig("BP_APPLICATION_SCRIPT", "the application start script", DefaultPattern))
 
-	result := libcnb.BuildResult{
-		Processes: []libcnb.Process{
-			{Type: "dist-zip", Command: s},
-			{Type: "task", Command: s},
-			{Type: "web", Command: s},
-		},
-	}
+	result := libcnb.NewBuildResult()
+
+	result.Processes = append(result.Processes,
+		libcnb.Process{Type: "dist-zip", Command: s},
+		libcnb.Process{Type: "task", Command: s},
+		libcnb.Process{Type: "web", Command: s},
+	)
 
 	return result, nil
 }
