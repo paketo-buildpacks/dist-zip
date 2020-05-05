@@ -17,10 +17,16 @@
 package main
 
 import (
+	"os"
+
 	"github.com/paketo-buildpacks/dist-zip/distzip"
 	"github.com/paketo-buildpacks/libpak"
+	"github.com/paketo-buildpacks/libpak/bard"
 )
 
 func main() {
-	libpak.Detect(distzip.Detect{})
+	libpak.Main(
+		distzip.Detect{},
+		distzip.Build{Logger: bard.NewLogger(os.Stdout)},
+	)
 }
