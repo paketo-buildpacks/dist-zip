@@ -26,6 +26,11 @@ id = "io.buildpacks.stacks.bionic"
 [[stacks]]
 id = "org.cloudfoundry.stacks.cflinuxfs3"
 
+[[metadata.configurations]]
+name        = "BP_APPLICATION_SCRIPT"
+description = "the application start script"
+default     = "*/bin/*"
+
 [metadata]
 pre-package   = "scripts/build.sh"
 include-files = [

@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/buildpacks/libcnb"
+	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
 )
 
@@ -28,7 +29,15 @@ type Build struct {
 }
 
 func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
-	sr := ScriptResolver{ApplicationPath: context.Application.Path}
+	cr, err := libpak.NewConfigurationResolver(context.Buildpack, nil)
+	if err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
+	}
+
+	sr := ScriptResolver{
+		ApplicationPath:       context.Application.Path,
+		ConfigurationResolver: cr,
+	}
 	s, ok, err := sr.Resolve()
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to detect application scripts\n%w", err)
@@ -39,9 +48,12 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 
 	b.Logger.Title(context.Buildpack)
-	b.Logger.Body(bard.FormatUserConfig("BP_APPLICATION_SCRIPT", "the application start script", DefaultPattern))
-
 	result := libcnb.NewBuildResult()
+
+	_, err = libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
+	if err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
+	}
 
 	result.Processes = append(result.Processes,
 		libcnb.Process{Type: "dist-zip", Command: s},

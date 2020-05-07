@@ -34,19 +34,26 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 
 		ctx    libcnb.DetectContext
 		detect distzip.Detect
-		path   string
 	)
 
 	it.Before(func() {
 		var err error
-		path, err = ioutil.TempDir("", "dist-zip")
+
+		ctx.Application.Path, err = ioutil.TempDir("", "dist-zip")
 		Expect(err).NotTo(HaveOccurred())
 
-		ctx.Application.Path = path
+		ctx.Buildpack.Metadata = map[string]interface{}{
+			"configurations": []map[string]interface{}{
+				{
+					"name":    "BP_APPLICATION_SCRIPT",
+					"default": "*/bin/*",
+				},
+			},
+		}
 	})
 
 	it.After(func() {
-		Expect(os.RemoveAll(path)).To(Succeed())
+		Expect(os.RemoveAll(ctx.Application.Path)).To(Succeed())
 	})
 
 	it("passes without application script", func() {

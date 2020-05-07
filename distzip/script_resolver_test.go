@@ -25,6 +25,7 @@ import (
 
 	. "github.com/onsi/gomega"
 	"github.com/paketo-buildpacks/dist-zip/distzip"
+	"github.com/paketo-buildpacks/libpak"
 	"github.com/sclevine/spec"
 )
 
@@ -40,6 +41,13 @@ func testScriptResolver(t *testing.T, context spec.G, it spec.S) {
 
 		r.ApplicationPath, err = ioutil.TempDir("", "script-resolver")
 		Expect(err).NotTo(HaveOccurred())
+
+		r.ConfigurationResolver = libpak.ConfigurationResolver{Configurations: []libpak.BuildpackConfiguration{
+			{
+				Name:    "BP_APPLICATION_SCRIPT",
+				Default: "*/bin/*",
+			},
+		}}
 	})
 
 	it.After(func() {

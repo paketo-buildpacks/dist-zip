@@ -40,6 +40,15 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		ctx.Application.Path, err = ioutil.TempDir("", "build-application")
 		Expect(err).NotTo(HaveOccurred())
+
+		ctx.Buildpack.Metadata = map[string]interface{}{
+			"configurations": []map[string]interface{}{
+				{
+					"name":    "BP_APPLICATION_SCRIPT",
+					"default": "*/bin/*",
+				},
+			},
+		}
 	})
 
 	it.After(func() {

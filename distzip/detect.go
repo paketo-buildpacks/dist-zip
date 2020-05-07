@@ -17,7 +17,10 @@
 package distzip
 
 import (
+	"fmt"
+
 	"github.com/buildpacks/libcnb"
+	"github.com/paketo-buildpacks/libpak"
 )
 
 type Detect struct{}
@@ -35,7 +38,15 @@ func (Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) 
 		},
 	}
 
-	sr := ScriptResolver{ApplicationPath: context.Application.Path}
+	cr, err := libpak.NewConfigurationResolver(context.Buildpack, nil)
+	if err != nil {
+		return libcnb.DetectResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
+	}
+
+	sr := ScriptResolver{
+		ApplicationPath:       context.Application.Path,
+		ConfigurationResolver: cr,
+	}
 	if _, ok, _ := sr.Resolve(); ok {
 		result.Plans[0].Provides = append(result.Plans[0].Provides, libcnb.BuildPlanProvide{Name: "jvm-application"})
 	}

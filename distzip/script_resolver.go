@@ -18,16 +18,16 @@ package distzip
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/paketo-buildpacks/libpak"
 )
 
-var DefaultPattern = filepath.Join("*", "bin", `*`)
-
 type ScriptResolver struct {
-	ApplicationPath string
+	ApplicationPath       string
+	ConfigurationResolver libpak.ConfigurationResolver
 }
 
 func (s *ScriptResolver) Resolve() (string, bool, error) {
@@ -38,14 +38,13 @@ func (s *ScriptResolver) Resolve() (string, bool, error) {
 		pattern    string
 	)
 
-	if pattern, ok = os.LookupEnv("BP_APPLICATION_SCRIPT"); ok {
+	if pattern, ok = s.ConfigurationResolver.Resolve("BP_APPLICATION_SCRIPT"); ok {
 		file := filepath.Join(s.ApplicationPath, pattern)
 		candidates, err = filepath.Glob(file)
 		if err != nil {
 			return "", false, fmt.Errorf("unable to find files with %s\n%w", pattern, err)
 		}
 	} else {
-		pattern = DefaultPattern
 		file := filepath.Join(s.ApplicationPath, pattern)
 		candidates, err = filepath.Glob(file)
 		if err != nil {
