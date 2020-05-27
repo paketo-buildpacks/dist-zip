@@ -30,6 +30,7 @@ id = "org.cloudfoundry.stacks.cflinuxfs3"
 name        = "BP_APPLICATION_SCRIPT"
 description = "the application start script"
 default     = "*/bin/*"
+build       = true
 
 [metadata]
 pre-package   = "scripts/build.sh"
