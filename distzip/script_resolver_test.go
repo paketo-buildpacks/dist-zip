@@ -24,9 +24,10 @@ import (
 	"testing"
 
 	. "github.com/onsi/gomega"
-	"github.com/paketo-buildpacks/dist-zip/distzip"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/sclevine/spec"
+
+	"github.com/paketo-buildpacks/dist-zip/distzip"
 )
 
 func testScriptResolver(t *testing.T, context spec.G, it spec.S) {

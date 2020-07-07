@@ -24,8 +24,9 @@ import (
 
 	"github.com/buildpacks/libcnb"
 	. "github.com/onsi/gomega"
-	"github.com/paketo-buildpacks/dist-zip/distzip"
 	"github.com/sclevine/spec"
+
+	"github.com/paketo-buildpacks/dist-zip/distzip"
 )
 
 func testDetect(t *testing.T, context spec.G, it spec.S) {
