@@ -14,7 +14,7 @@ The buildpack will do the following:
 ## Configuration
 | Environment Variable | Description
 | -------------------- | -----------
-| `$BP_APPLICATION_SCRIPT` | Configures the application start script, using [bash Pattern Matching][b]. Defaults to `*/bin/*`.
+| `$BP_APPLICATION_SCRIPT` | Configures the application start script, using [Bash Pattern Matching][b]. Defaults to `*/bin/*`.
 
 ## License
 This buildpack is released under version 2.0 of the [Apache License][a].
