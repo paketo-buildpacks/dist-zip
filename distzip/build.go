@@ -29,6 +29,8 @@ type Build struct {
 }
 
 func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
+	result := libcnb.NewBuildResult()
+
 	cr, err := libpak.NewConfigurationResolver(context.Buildpack, nil)
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
@@ -44,11 +46,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 
 	if !ok {
-		return libcnb.BuildResult{}, nil
+		for _, entry := range context.Plan.Entries {
+			result.Unmet = append(result.Unmet, libcnb.UnmetPlanEntry{Name: entry.Name})
+		}
+		return result, nil
 	}
 
 	b.Logger.Title(context.Buildpack)
-	result := libcnb.NewBuildResult()
 
 	_, err = libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
 	if err != nil {
