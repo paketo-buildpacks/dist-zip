@@ -50,24 +50,43 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				},
 			},
 		}
+		ctx.Plan = libcnb.BuildpackPlan{Entries: []libcnb.BuildpackPlanEntry{
+			{
+				Name: "jvm-application",
+			},
+		}}
 	})
 
 	it.After(func() {
 		Expect(os.RemoveAll(ctx.Application.Path)).To(Succeed())
 	})
 
-	it("contributes DistZip", func() {
-		Expect(os.MkdirAll(filepath.Join(ctx.Application.Path, "app", "bin"), 0755)).To(Succeed())
-		Expect(ioutil.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "test-script"), []byte{}, 0755))
+	context("DistZip exists", func() {
+		it.Before(func() {
+			Expect(os.MkdirAll(filepath.Join(ctx.Application.Path, "app", "bin"), 0755)).To(Succeed())
+			Expect(ioutil.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "test-script"), []byte{}, 0755))
+		})
 
-		result, err := distzip.Build{}.Build(ctx)
-		Expect(err).NotTo(HaveOccurred())
+		it("contributes processes", func() {
+			result, err := distzip.Build{}.Build(ctx)
+			Expect(err).NotTo(HaveOccurred())
 
-		Expect(result.Processes).To(ContainElements(
-			libcnb.Process{Type: "dist-zip", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
-			libcnb.Process{Type: "task", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
-			libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
-		))
+			Expect(result.Processes).To(ContainElements(
+				libcnb.Process{Type: "dist-zip", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
+				libcnb.Process{Type: "task", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
+				libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
+			))
+		})
 	})
 
+	context("DistZip does not exists", func() {
+		it("passes plan entries to subsequent buildpacks", func() {
+			result, err := distzip.Build{}.Build(ctx)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(result.Processes).To(BeEmpty())
+			Expect(len(result.Unmet)).To(Equal(1))
+			Expect(result.Unmet[0].Name).To(Equal("jvm-application"))
+		})
+	})
 }
