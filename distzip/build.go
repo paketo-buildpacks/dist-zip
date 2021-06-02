@@ -62,7 +62,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	result.Processes = append(result.Processes,
 		libcnb.Process{Type: "dist-zip", Command: s},
 		libcnb.Process{Type: "task", Command: s},
-		libcnb.Process{Type: "web", Command: s},
+		libcnb.Process{Type: "web", Command: s, Default: true},
 	)
 
 	return result, nil

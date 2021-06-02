@@ -74,7 +74,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			Expect(result.Processes).To(ContainElements(
 				libcnb.Process{Type: "dist-zip", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
 				libcnb.Process{Type: "task", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
-				libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
+				libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script"), Default: true},
 			))
 		})
 	})
