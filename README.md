@@ -21,3 +21,4 @@ This buildpack is released under version 2.0 of the [Apache License][a].
 
 [a]: http://www.apache.org/licenses/LICENSE-2.0
 [b]: https://www.gnu.org/software/bash/manual/html_node/Pattern-Matching.html
+
