@@ -30,7 +30,10 @@ uri  = "https://github.com/paketo-buildpacks/dist-zip/blob/main/LICENSE"
 id = "io.buildpacks.stacks.bionic"
 
 [[stacks]]
-id = "org.cloudfoundry.stacks.cflinuxfs3"
+id = "io.paketo.stacks.tiny"
+
+[[stacks]]
+id = "*"
 
 [[metadata.configurations]]
 name        = "BP_APPLICATION_SCRIPT"
