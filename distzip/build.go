@@ -65,5 +65,21 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		libcnb.Process{Type: "web", Command: s, Default: true},
 	)
 
+	if cr.ResolveBool("BP_LIVE_RELOAD_ENABLED") {
+		for i := 0; i < len(result.Processes); i++ {
+			result.Processes[i].Default = false
+		}
+
+		result.Processes = append(result.Processes,
+			libcnb.Process{
+				Type:      "reload",
+				Command:   "watchexec",
+				Arguments: []string{"-r", s},
+				Direct:    false,
+				Default:   true,
+			},
+		)
+	}
+
 	return result, nil
 }
