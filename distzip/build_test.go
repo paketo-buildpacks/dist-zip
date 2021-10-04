@@ -77,6 +77,28 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script"), Default: true},
 			))
 		})
+
+		context("$BP_LIVE_RELOAD_ENABLED is true", func() {
+			it.Before(func() {
+				Expect(os.Setenv("BP_LIVE_RELOAD_ENABLED", "true")).To(Succeed())
+			})
+
+			it.After(func() {
+				Expect(os.Unsetenv("BP_LIVE_RELOAD_ENABLED")).To(Succeed())
+			})
+
+			it("contributes reloadable process type", func() {
+				result, err := distzip.Build{}.Build(ctx)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(result.Processes).To(ContainElements(
+					libcnb.Process{Type: "dist-zip", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
+					libcnb.Process{Type: "task", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
+					libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
+					libcnb.Process{Type: "reload", Command: "watchexec", Arguments: []string{"-r", filepath.Join(ctx.Application.Path, "app", "bin", "test-script")}, Default: true},
+				))
+			})
+		})
 	})
 
 	context("DistZip does not exists", func() {

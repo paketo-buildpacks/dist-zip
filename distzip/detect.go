@@ -27,6 +27,7 @@ const (
 	PlanEntryJVMApplication        = "jvm-application"
 	PlanEntryJVMApplicationPackage = "jvm-application-package"
 	PlanEntryJRE                   = "jre"
+	PlanEntryWatchexec             = "watchexec"
 )
 
 type Detect struct{}
@@ -59,6 +60,14 @@ func (Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) 
 	}
 	if _, ok, _ := sr.Resolve(); ok {
 		result.Plans[0].Provides = append(result.Plans[0].Provides, libcnb.BuildPlanProvide{Name: PlanEntryJVMApplicationPackage})
+	}
+
+	if cr.ResolveBool("BP_LIVE_RELOAD_ENABLED") {
+		for i := range result.Plans {
+			result.Plans[i].Requires = append(result.Plans[i].Requires, libcnb.BuildPlanRequire{
+				Name: PlanEntryWatchexec,
+			})
+		}
 	}
 
 	return result, nil

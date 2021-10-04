@@ -41,6 +41,12 @@ description = "the application start script"
 default     = "*/bin/*"
 build       = true
 
+[[metadata.configurations]]
+name        = "BP_LIVE_RELOAD_ENABLED"
+description = "enable live process reload in the image"
+default     = "false"
+build       = true
+
 [metadata]
 pre-package   = "scripts/build.sh"
 include-files = [
