@@ -19,13 +19,17 @@ package distzip
 import (
 	"fmt"
 
+	"github.com/paketo-buildpacks/libpak/effect"
+	"github.com/paketo-buildpacks/libpak/sbom"
+
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
 )
 
 type Build struct {
-	Logger bard.Logger
+	Logger      bard.Logger
+	SBOMScanner sbom.SBOMScanner
 }
 
 func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
@@ -79,6 +83,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 				Default:   true,
 			},
 		)
+	}
+
+	if b.SBOMScanner == nil {
+		b.SBOMScanner = sbom.NewSyftCLISBOMScanner(context.Layers, effect.NewExecutor(), b.Logger)
+	}
+	if err := b.SBOMScanner.ScanLaunch(context.Application.Path, libcnb.SyftJSON, libcnb.CycloneDXJSON); err != nil {
+		return libcnb.BuildResult{}, fmt.Errorf("unable to create Build SBoM \n%w", err)
 	}
 
 	return result, nil

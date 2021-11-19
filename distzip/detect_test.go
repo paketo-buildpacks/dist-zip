@@ -67,6 +67,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							{Name: "jvm-application"},
 						},
 						Requires: []libcnb.BuildPlanRequire{
+							{Name: "syft"},
 							{Name: "jre", Metadata: map[string]interface{}{"launch": true}},
 							{Name: "jvm-application-package"},
 							{Name: "jvm-application"},
@@ -93,6 +94,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							{Name: "jvm-application"},
 						},
 						Requires: []libcnb.BuildPlanRequire{
+							{Name: "syft"},
 							{Name: "jre", Metadata: map[string]interface{}{"launch": true}},
 							{Name: "jvm-application-package"},
 							{Name: "jvm-application"},
@@ -119,6 +121,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							{Name: "jvm-application-package"},
 						},
 						Requires: []libcnb.BuildPlanRequire{
+							{Name: "syft"},
 							{Name: "jre", Metadata: map[string]interface{}{"launch": true}},
 							{Name: "jvm-application-package"},
 							{Name: "jvm-application"},
@@ -151,6 +154,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 							{Name: "jvm-application-package"},
 						},
 						Requires: []libcnb.BuildPlanRequire{
+							{Name: "syft"},
 							{Name: "jre", Metadata: map[string]interface{}{"launch": true}},
 							{Name: "jvm-application-package"},
 							{Name: "jvm-application"},
