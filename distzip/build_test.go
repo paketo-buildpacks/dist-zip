@@ -22,6 +22,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/paketo-buildpacks/libpak/sbom/mocks"
+
 	"github.com/buildpacks/libcnb"
 	. "github.com/onsi/gomega"
 	"github.com/sclevine/spec"
@@ -31,9 +33,9 @@ import (
 
 func testBuild(t *testing.T, context spec.G, it spec.S) {
 	var (
-		Expect = NewWithT(t).Expect
-
-		ctx libcnb.BuildContext
+		Expect      = NewWithT(t).Expect
+		sbomScanner mocks.SBOMScanner
+		ctx         libcnb.BuildContext
 	)
 
 	it.Before(func() {
@@ -55,6 +57,9 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				Name: "jvm-application",
 			},
 		}}
+		sbomScanner = mocks.SBOMScanner{}
+		sbomScanner.On("ScanLaunch", ctx.Application.Path, libcnb.SyftJSON, libcnb.CycloneDXJSON).Return(nil)
+
 	})
 
 	it.After(func() {
@@ -68,7 +73,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		})
 
 		it("contributes processes", func() {
-			result, err := distzip.Build{}.Build(ctx)
+			result, err := distzip.Build{SBOMScanner: &sbomScanner}.Build(ctx)
 			Expect(err).NotTo(HaveOccurred())
 
 			Expect(result.Processes).To(ContainElements(
@@ -76,6 +81,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				libcnb.Process{Type: "task", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
 				libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script"), Default: true},
 			))
+			sbomScanner.AssertCalled(t, "ScanLaunch", ctx.Application.Path, libcnb.SyftJSON, libcnb.CycloneDXJSON)
 		})
 
 		context("$BP_LIVE_RELOAD_ENABLED is true", func() {
@@ -88,7 +94,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 			})
 
 			it("contributes reloadable process type", func() {
-				result, err := distzip.Build{}.Build(ctx)
+				result, err := distzip.Build{SBOMScanner: &sbomScanner}.Build(ctx)
 				Expect(err).NotTo(HaveOccurred())
 
 				Expect(result.Processes).To(ContainElements(
@@ -97,6 +103,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					libcnb.Process{Type: "web", Command: filepath.Join(ctx.Application.Path, "app", "bin", "test-script")},
 					libcnb.Process{Type: "reload", Command: "watchexec", Arguments: []string{"-r", filepath.Join(ctx.Application.Path, "app", "bin", "test-script")}, Default: true},
 				))
+				sbomScanner.AssertCalled(t, "ScanLaunch", ctx.Application.Path, libcnb.SyftJSON, libcnb.CycloneDXJSON)
 			})
 		})
 	})
