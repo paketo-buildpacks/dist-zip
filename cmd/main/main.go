@@ -22,7 +22,7 @@ import (
 	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bard"
 
-	"github.com/paketo-buildpacks/dist-zip/distzip"
+	"github.com/paketo-buildpacks/dist-zip/v5/distzip"
 )
 
 func main() {
