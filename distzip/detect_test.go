@@ -26,7 +26,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/sclevine/spec"
 
-	"github.com/paketo-buildpacks/dist-zip/distzip"
+	"github.com/paketo-buildpacks/dist-zip/v5/distzip"
 )
 
 func testDetect(t *testing.T, context spec.G, it spec.S) {

@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-GOOS="linux" go build -ldflags='-s -w' -o bin/main github.com/paketo-buildpacks/dist-zip/cmd/main
+GOOS="linux" go build -ldflags='-s -w' -o bin/main github.com/paketo-buildpacks/dist-zip/v5/cmd/main
 
 if [ "${STRIP:-false}" != "false" ]; then
   strip bin/main
