@@ -17,6 +17,9 @@
 package distzip_test
 
 import (
+	"bytes"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -27,12 +30,14 @@ import (
 	"github.com/sclevine/spec"
 
 	"github.com/paketo-buildpacks/dist-zip/v5/distzip"
+	"github.com/paketo-buildpacks/libpak/bard"
 )
 
 func testDetect(t *testing.T, context spec.G, it spec.S) {
 	var (
 		Expect = NewWithT(t).Expect
 
+		buf    *bytes.Buffer
 		ctx    libcnb.DetectContext
 		detect distzip.Detect
 	)
@@ -51,6 +56,10 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 				},
 			},
 		}
+
+		buf = &bytes.Buffer{}
+		detect = distzip.Detect{
+			Logger: bard.NewLoggerWithOptions(io.Discard, bard.WithDebug(buf))}
 	})
 
 	it.After(func() {
@@ -102,6 +111,10 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 					},
 				},
 			}))
+			Expect(buf.String()).To(ContainSubstring(fmt.Sprintf(`too many application scripts in */bin/*, candidates: [%s %s]`,
+				filepath.Join(ctx.Application.Path, "app", "bin", "script-1"),
+				filepath.Join(ctx.Application.Path, "app", "bin", "script-2"))))
+			Expect(buf.String()).To(ContainSubstring("set a more strict `$BP_APPLICATION_SCRIPT` pattern that only matches a single script"))
 		})
 	})
 

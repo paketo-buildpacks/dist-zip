@@ -43,6 +43,7 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	sr := ScriptResolver{
 		ApplicationPath:       context.Application.Path,
 		ConfigurationResolver: cr,
+		Logger:                b.Logger,
 	}
 	s, ok, err := sr.Resolve()
 	if err != nil {

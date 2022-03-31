@@ -21,6 +21,7 @@ import (
 
 	"github.com/buildpacks/libcnb"
 	"github.com/paketo-buildpacks/libpak"
+	"github.com/paketo-buildpacks/libpak/bard"
 )
 
 const (
@@ -31,9 +32,11 @@ const (
 	PlanEntrySyft                  = "syft"
 )
 
-type Detect struct{}
+type Detect struct {
+	Logger bard.Logger
+}
 
-func (Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
+func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
 	result := libcnb.DetectResult{
 		Pass: true,
 		Plans: []libcnb.BuildPlan{
@@ -59,8 +62,11 @@ func (Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) 
 	sr := ScriptResolver{
 		ApplicationPath:       context.Application.Path,
 		ConfigurationResolver: cr,
+		Logger:                d.Logger,
 	}
-	if _, ok, _ := sr.Resolve(); ok {
+	if _, ok, err := sr.Resolve(); err != nil {
+		return libcnb.DetectResult{}, fmt.Errorf("unable to resolve dist-zip scripts\n%w", err)
+	} else if ok {
 		result.Plans[0].Provides = append(result.Plans[0].Provides, libcnb.BuildPlanProvide{Name: PlanEntryJVMApplicationPackage})
 	}
 

@@ -17,7 +17,9 @@
 package distzip_test
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -25,6 +27,7 @@ import (
 
 	. "github.com/onsi/gomega"
 	"github.com/paketo-buildpacks/libpak"
+	"github.com/paketo-buildpacks/libpak/bard"
 	"github.com/sclevine/spec"
 
 	"github.com/paketo-buildpacks/dist-zip/v5/distzip"
@@ -96,15 +99,21 @@ func testScriptResolver(t *testing.T, context spec.G, it spec.S) {
 		Expect(ok).To(BeFalse())
 	})
 
-	it("returns error for multiple scripts", func() {
+	it("returns false for no script and logs an error", func() {
+		buf := &bytes.Buffer{}
+		r.Logger = bard.NewLoggerWithOptions(io.Discard, bard.WithDebug(buf))
+
 		Expect(os.MkdirAll(filepath.Join(r.ApplicationPath, "app", "bin"), 0755)).To(Succeed())
 		Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "alpha"), []byte{}, 0755)).To(Succeed())
 		Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "bravo"), []byte{}, 0755)).To(Succeed())
 
 		_, _, err := r.Resolve()
-		Expect(err).To(MatchError(fmt.Sprintf(`unable to find application script in */bin/*, candidates: [%s %s]`,
+
+		Expect(err).ToNot(HaveOccurred())
+		Expect(buf.String()).To(ContainSubstring(fmt.Sprintf(`too many application scripts in */bin/*, candidates: [%s %s]`,
 			filepath.Join(r.ApplicationPath, "app", "bin", "alpha"),
 			filepath.Join(r.ApplicationPath, "app", "bin", "bravo"))))
+		Expect(buf.String()).To(ContainSubstring("set a more strict `$BP_APPLICATION_SCRIPT` pattern that only matches a single script"))
 	})
 
 }

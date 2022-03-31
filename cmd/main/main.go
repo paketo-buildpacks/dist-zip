@@ -26,8 +26,10 @@ import (
 )
 
 func main() {
+	logger := bard.NewLogger(os.Stdout)
+
 	libpak.Main(
-		distzip.Detect{},
-		distzip.Build{Logger: bard.NewLogger(os.Stdout)},
+		distzip.Detect{Logger: logger},
+		distzip.Build{Logger: logger},
 	)
 }
