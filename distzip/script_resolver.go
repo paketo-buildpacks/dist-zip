@@ -23,11 +23,13 @@ import (
 	"strings"
 
 	"github.com/paketo-buildpacks/libpak"
+	"github.com/paketo-buildpacks/libpak/bard"
 )
 
 type ScriptResolver struct {
 	ApplicationPath       string
 	ConfigurationResolver libpak.ConfigurationResolver
+	Logger                bard.Logger
 }
 
 func (s *ScriptResolver) Resolve() (string, bool, error) {
@@ -67,6 +69,8 @@ func (s *ScriptResolver) Resolve() (string, bool, error) {
 		return candidates[0], true, nil
 	default:
 		sort.Strings(candidates)
-		return "", false, fmt.Errorf("unable to find application script in %s, candidates: %s", pattern, candidates)
+		s.Logger.Debugf("too many application scripts in %s, candidates: %s", pattern, candidates)
+		s.Logger.Debug("set a more strict `$BP_APPLICATION_SCRIPT` pattern that only matches a single script")
+		return "", false, nil
 	}
 }
