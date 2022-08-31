@@ -16,7 +16,7 @@ api = "0.7"
 
 [buildpack]
   id       = "paketo-buildpacks/dist-zip"
-  name     = "Paketo DistZip Buildpack"
+  name     = "Paketo Buildpack for DistZip"
   version  = "{{.version}}"
   homepage = "https://github.com/paketo-buildpacks/dist-zip"
   description = "A Cloud Native Buildpack that contributes a Process Type for DistZip-style applications"
