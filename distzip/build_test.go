@@ -17,6 +17,8 @@
 package distzip_test
 
 import (
+	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -104,6 +106,34 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 					libcnb.Process{Type: "reload", Command: "watchexec", Arguments: []string{"-r", filepath.Join(ctx.Application.Path, "app", "bin", "test-script")}, Default: true},
 				))
 				sbomScanner.AssertCalled(t, "ScanLaunch", ctx.Application.Path, libcnb.SyftJSON, libcnb.CycloneDXJSON)
+			})
+
+			it("marks all workspace files as group read-write", func() {
+				_, err := distzip.Build{SBOMScanner: &sbomScanner}.Build(ctx)
+				Expect(err).NotTo(HaveOccurred())
+
+				var modes []string
+				err = filepath.Walk(ctx.Application.Path, func(path string, info fs.FileInfo, err error) error {
+					if err != nil {
+						return err
+					}
+					if path != ctx.Application.Path {
+						rel, err := filepath.Rel(ctx.Application.Path, path)
+						if err != nil {
+							return err
+						}
+						modes = append(modes, fmt.Sprintf("%s %s", info.Mode(), rel))
+					}
+
+					return nil
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(modes).To(ConsistOf(
+					"drwxrwxr-x app",
+					"drwxrwxr-x app/bin",
+					"-rwxrwxr-x app/bin/test-script",
+				))
 			})
 		})
 	})
