@@ -48,6 +48,12 @@ description = "enable live process reload in the image"
 default     = "false"
 build       = true
 
+[[metadata.configurations]]
+name        = "BP_APP_PATH_GROUP_WRITABLE"
+description = "make the application path group-writable"
+default     = "false"
+build       = true
+
 [metadata]
 pre-package   = "scripts/build.sh"
 include-files = [

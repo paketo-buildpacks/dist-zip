@@ -73,6 +73,13 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		libcnb.Process{Type: "web", Command: s, Default: true},
 	)
 
+	if cr.ResolveBool("BP_APP_PATH_GROUP_WRITABLE") {
+		if err := markFolderAsReadWrite(context.Application.Path); err != nil {
+			return libcnb.BuildResult{}, err
+		}
+		b.Logger.Headerf("Successfully marked applicationPath, %s, as group-writable", context.Application.Path)
+	}
+
 	if cr.ResolveBool("BP_LIVE_RELOAD_ENABLED") {
 		for i := 0; i < len(result.Processes); i++ {
 			result.Processes[i].Default = false
@@ -88,18 +95,8 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 			},
 		)
 
-		err = filepath.Walk(context.Application.Path, func(path string, info fs.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if path == context.Application.Path {
-				return nil
-			}
-
-			return os.Chmod(path, info.Mode()|0060)
-		})
-		if err != nil {
-			return libcnb.BuildResult{}, fmt.Errorf("unable to mark files as group read-write for live reload\n%w", err)
+		if err := markFolderAsReadWrite(context.Application.Path); err != nil {
+			return libcnb.BuildResult{}, err
 		}
 	}
 
@@ -111,4 +108,21 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	}
 
 	return result, nil
+}
+
+func markFolderAsReadWrite(folderPath string) error {
+	err := filepath.Walk(folderPath, func(path string, info fs.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if path == folderPath {
+			return nil
+		}
+
+		return os.Chmod(path, info.Mode()|0060)
+	})
+	if err != nil {
+		return fmt.Errorf("unable to mark files as group read-write for live reload\n%w", err)
+	}
+	return nil
 }

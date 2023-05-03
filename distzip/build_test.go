@@ -136,6 +136,44 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 				))
 			})
 		})
+
+		context("$BP_APP_PATH_GROUP_WRITABLE is true", func() {
+			it.Before(func() {
+				Expect(os.Setenv("BP_APP_PATH_GROUP_WRITABLE", "true")).To(Succeed())
+			})
+
+			it.After(func() {
+				Expect(os.Unsetenv("BP_APP_PATH_GROUP_WRITABLE")).To(Succeed())
+			})
+
+			it("marks all workspace files as group read-write", func() {
+				_, err := distzip.Build{SBOMScanner: &sbomScanner}.Build(ctx)
+				Expect(err).NotTo(HaveOccurred())
+
+				var modes []string
+				err = filepath.Walk(ctx.Application.Path, func(path string, info fs.FileInfo, err error) error {
+					if err != nil {
+						return err
+					}
+					if path != ctx.Application.Path {
+						rel, err := filepath.Rel(ctx.Application.Path, path)
+						if err != nil {
+							return err
+						}
+						modes = append(modes, fmt.Sprintf("%s %s", info.Mode(), rel))
+					}
+
+					return nil
+				})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(modes).To(ConsistOf(
+					"drwxrwxr-x app",
+					"drwxrwxr-x app/bin",
+					"-rwxrwxr-x app/bin/test-script",
+				))
+			})
+		})
 	})
 
 	context("DistZip does not exists", func() {

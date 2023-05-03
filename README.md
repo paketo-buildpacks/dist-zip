@@ -16,10 +16,11 @@ When `$BP_LIVE_RELOAD_ENABLE` is true:
 * Contributes `reload` process type
 
 ## Configuration
-| Environment Variable      | Description                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------- |
-| `$BP_APPLICATION_SCRIPT`  | Configures the application start script, using [Bash Pattern Matching][b]. Defaults to `*/bin/*`. |
-| `$BP_LIVE_RELOAD_ENABLED` | Enable live process reloading. Defaults to false.                                                 |
+| Environment Variable          | Description                                                                                                   |
+|-------------------------------|---------------------------------------------------------------------------------------------------------------|
+| `$BP_APPLICATION_SCRIPT`      | Configures the application start script, using [Bash Pattern Matching][b]. Defaults to `*/bin/*`.             |
+| `$BP_LIVE_RELOAD_ENABLED`     | Enable live process reloading. Defaults to false.                                                             |
+| `$BP_APP_PATH_GROUP_WRITABLE` | Make the application path group-writable; convenient for apps that write files at runtime. Defaults to false. |
 
 ## License
 This buildpack is released under version 2.0 of the [Apache License][a].
