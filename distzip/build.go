@@ -122,7 +122,7 @@ func markFolderAsReadWrite(folderPath string) error {
 		return os.Chmod(path, info.Mode()|0060)
 	})
 	if err != nil {
-		return fmt.Errorf("unable to mark files as group read-write for live reload\n%w", err)
+		return fmt.Errorf("unable to mark files as group read-write\n%w", err)
 	}
 	return nil
 }
