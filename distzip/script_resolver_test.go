@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -43,7 +42,7 @@ func testScriptResolver(t *testing.T, context spec.G, it spec.S) {
 	it.Before(func() {
 		var err error
 
-		r.ApplicationPath, err = ioutil.TempDir("", "script-resolver")
+		r.ApplicationPath = t.TempDir()
 		Expect(err).NotTo(HaveOccurred())
 
 		r.ConfigurationResolver = libpak.ConfigurationResolver{Configurations: []libpak.BuildpackConfiguration{
@@ -54,14 +53,10 @@ func testScriptResolver(t *testing.T, context spec.G, it spec.S) {
 		}}
 	})
 
-	it.After(func() {
-		Expect(os.RemoveAll(r.ApplicationPath)).To(Succeed())
-	})
-
 	it("returns script", func() {
 		Expect(os.MkdirAll(filepath.Join(r.ApplicationPath, "app", "bin"), 0755)).To(Succeed())
-		Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "alpha.sh"), []byte{}, 0755)).To(Succeed())
-		Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "alpha.bat"), []byte{}, 0755)).To(Succeed())
+		Expect(os.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "alpha.sh"), []byte{}, 0755)).To(Succeed())
+		Expect(os.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "alpha.bat"), []byte{}, 0755)).To(Succeed())
 
 		s, ok, err := r.Resolve()
 		Expect(err).NotTo(HaveOccurred())
@@ -72,17 +67,13 @@ func testScriptResolver(t *testing.T, context spec.G, it spec.S) {
 
 	context("$BP_APPLICATION_SCRIPT", func() {
 		it.Before(func() {
-			Expect(os.Setenv("BP_APPLICATION_SCRIPT", filepath.Join("bin", "*.bat"))).To(Succeed())
-		})
-
-		it.After(func() {
-			Expect(os.Unsetenv("BP_APPLICATION_SCRIPT")).To(Succeed())
+			t.Setenv("BP_APPLICATION_SCRIPT", filepath.Join("bin", "*.bat"))
 		})
 
 		it("returns script from $BP_APPLICATION_SCRIPT", func() {
 			Expect(os.MkdirAll(filepath.Join(r.ApplicationPath, "bin"), 0755)).To(Succeed())
-			Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "bin", "alpha.sh"), []byte{}, 0755)).To(Succeed())
-			Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "bin", "alpha.bat"), []byte{}, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(r.ApplicationPath, "bin", "alpha.sh"), []byte{}, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(r.ApplicationPath, "bin", "alpha.bat"), []byte{}, 0755)).To(Succeed())
 
 			s, ok, err := r.Resolve()
 			Expect(err).NotTo(HaveOccurred())
@@ -104,8 +95,8 @@ func testScriptResolver(t *testing.T, context spec.G, it spec.S) {
 		r.Logger = bard.NewLoggerWithOptions(io.Discard, bard.WithDebug(buf))
 
 		Expect(os.MkdirAll(filepath.Join(r.ApplicationPath, "app", "bin"), 0755)).To(Succeed())
-		Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "alpha"), []byte{}, 0755)).To(Succeed())
-		Expect(ioutil.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "bravo"), []byte{}, 0755)).To(Succeed())
+		Expect(os.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "alpha"), []byte{}, 0755)).To(Succeed())
+		Expect(os.WriteFile(filepath.Join(r.ApplicationPath, "app", "bin", "bravo"), []byte{}, 0755)).To(Succeed())
 
 		_, _, err := r.Resolve()
 

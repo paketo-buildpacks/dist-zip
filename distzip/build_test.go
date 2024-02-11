@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package distzip_test
 import (
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -43,7 +42,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 	it.Before(func() {
 		var err error
 
-		ctx.Application.Path, err = ioutil.TempDir("", "build-application")
+		ctx.Application.Path = t.TempDir()
 		Expect(err).NotTo(HaveOccurred())
 
 		ctx.Buildpack.Metadata = map[string]interface{}{
@@ -61,17 +60,12 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		}}
 		sbomScanner = mocks.SBOMScanner{}
 		sbomScanner.On("ScanLaunch", ctx.Application.Path, libcnb.SyftJSON, libcnb.CycloneDXJSON).Return(nil)
-
-	})
-
-	it.After(func() {
-		Expect(os.RemoveAll(ctx.Application.Path)).To(Succeed())
 	})
 
 	context("DistZip exists", func() {
 		it.Before(func() {
 			Expect(os.MkdirAll(filepath.Join(ctx.Application.Path, "app", "bin"), 0755)).To(Succeed())
-			Expect(ioutil.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "test-script"), []byte{}, 0755))
+			Expect(os.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "test-script"), []byte{}, 0755))
 		})
 
 		it("contributes processes", func() {
@@ -88,11 +82,7 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 
 		context("$BP_LIVE_RELOAD_ENABLED is true", func() {
 			it.Before(func() {
-				Expect(os.Setenv("BP_LIVE_RELOAD_ENABLED", "true")).To(Succeed())
-			})
-
-			it.After(func() {
-				Expect(os.Unsetenv("BP_LIVE_RELOAD_ENABLED")).To(Succeed())
+				t.Setenv("BP_LIVE_RELOAD_ENABLED", "true")
 			})
 
 			it("contributes reloadable process type", func() {

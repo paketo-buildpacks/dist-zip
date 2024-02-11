@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -45,7 +44,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 	it.Before(func() {
 		var err error
 
-		ctx.Application.Path, err = ioutil.TempDir("", "dist-zip")
+		ctx.Application.Path = t.TempDir()
 		Expect(err).NotTo(HaveOccurred())
 
 		ctx.Buildpack.Metadata = map[string]interface{}{
@@ -60,10 +59,6 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		buf = &bytes.Buffer{}
 		detect = distzip.Detect{
 			Logger: bard.NewLoggerWithOptions(io.Discard, bard.WithDebug(buf))}
-	})
-
-	it.After(func() {
-		Expect(os.RemoveAll(ctx.Application.Path)).To(Succeed())
 	})
 
 	context("application script not found", func() {
@@ -90,8 +85,8 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 	context("multiple application scripts", func() {
 		it.Before(func() {
 			Expect(os.MkdirAll(filepath.Join(ctx.Application.Path, "app", "bin"), 0755)).To(Succeed())
-			Expect(ioutil.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script-1"), []byte{}, 0755)).To(Succeed())
-			Expect(ioutil.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script-2"), []byte{}, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script-1"), []byte{}, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script-2"), []byte{}, 0755)).To(Succeed())
 		})
 
 		it("requires jvm-application-package", func() {
@@ -121,7 +116,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 	context("single application script", func() {
 		it.Before(func() {
 			Expect(os.MkdirAll(filepath.Join(ctx.Application.Path, "app", "bin"), 0755)).To(Succeed())
-			Expect(ioutil.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script"), []byte{}, 0755)).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script"), []byte{}, 0755)).To(Succeed())
 		})
 
 		it("requires and provides jvm-application-package", func() {
@@ -147,14 +142,10 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 
 	context("$BP_LIVE_RELOAD_ENABLED is set", func() {
 		it.Before(func() {
-			Expect(os.Setenv("BP_LIVE_RELOAD_ENABLED", "true")).To(Succeed())
+			t.Setenv("BP_LIVE_RELOAD_ENABLED", "true")
 
 			Expect(os.MkdirAll(filepath.Join(ctx.Application.Path, "app", "bin"), 0755)).To(Succeed())
-			Expect(ioutil.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script"), []byte{}, 0755)).To(Succeed())
-		})
-
-		it.After(func() {
-			Expect(os.Unsetenv("BP_LIVE_RELOAD_ENABLED")).To(Succeed())
+			Expect(os.WriteFile(filepath.Join(ctx.Application.Path, "app", "bin", "script"), []byte{}, 0755)).To(Succeed())
 		})
 
 		it("requires watchexec", func() {
