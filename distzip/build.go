@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/heroku/color"
 	"github.com/paketo-buildpacks/libpak/effect"
 	"github.com/paketo-buildpacks/libpak/sbom"
 
@@ -65,6 +66,11 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 	_, err = libpak.NewConfigurationResolver(context.Buildpack, &b.Logger)
 	if err != nil {
 		return libcnb.BuildResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
+	}
+
+	err = os.Chmod(s, 0755)
+	if err != nil {
+		b.Logger.Bodyf("%s Unable to make script executable\n%w", color.YellowString("WARNING:"), err.Error())
 	}
 
 	result.Processes = append(result.Processes,

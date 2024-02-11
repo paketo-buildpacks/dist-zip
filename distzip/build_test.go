@@ -128,6 +128,32 @@ func testBuild(t *testing.T, context spec.G, it spec.S) {
 		})
 	})
 
+	context("DistZip exists but isn't executable", func() {
+		var scriptPath string
+
+		it.Before(func() {
+			scriptPath = filepath.Join(ctx.Application.Path, "app", "bin", "test-script")
+			Expect(os.MkdirAll(filepath.Join(ctx.Application.Path, "app", "bin"), 0755)).To(Succeed())
+			Expect(os.WriteFile(scriptPath, []byte{}, 0644))
+		})
+
+		it("contributes processes and marks the script executable", func() {
+			result, err := distzip.Build{SBOMScanner: &sbomScanner}.Build(ctx)
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(result.Processes).To(ContainElements(
+				libcnb.Process{Type: "dist-zip", Command: scriptPath},
+				libcnb.Process{Type: "task", Command: scriptPath},
+				libcnb.Process{Type: "web", Command: scriptPath, Default: true},
+			))
+			sbomScanner.AssertCalled(t, "ScanLaunch", ctx.Application.Path, libcnb.SyftJSON, libcnb.CycloneDXJSON)
+
+			info, err := os.Stat(scriptPath)
+			Expect(err).NotTo(HaveOccurred())
+			Expect(info.Mode().Perm().String()).To(Equal("-rwxr-xr-x"))
+		})
+	})
+
 	context("DistZip does not exists", func() {
 		it("passes plan entries to subsequent buildpacks", func() {
 			result, err := distzip.Build{}.Build(ctx)
