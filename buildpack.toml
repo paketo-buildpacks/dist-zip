@@ -1,4 +1,4 @@
-# Copyright 2018-2020 the original author or authors.
+# Copyright 2018-2024 the original author or authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,12 +26,6 @@ api = "0.7"
 [[buildpack.licenses]]
 type = "Apache-2.0"
 uri  = "https://github.com/paketo-buildpacks/dist-zip/blob/main/LICENSE"
-
-[[stacks]]
-id = "io.buildpacks.stacks.bionic"
-
-[[stacks]]
-id = "io.paketo.stacks.tiny"
 
 [[stacks]]
 id = "*"
