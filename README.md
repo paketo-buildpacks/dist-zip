@@ -1,4 +1,7 @@
-# `gcr.io/paketo-buildpacks/dist-zip`
+# Paketo Buildpack for Dist Zip
+
+## Buildpack ID: `paketo-buildpacks/dist-zip`
+## Registry URLs: `docker.io/paketobuildpacks/dist-zip`
 
 The Paketo Buildpack for DistZip is a Cloud Native Buildpack that contributes a Process Type for DistZip-style applications.
 
