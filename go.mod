@@ -16,7 +16,7 @@ require (
 	github.com/creack/pty v1.1.24 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
-	github.com/mattn/go-colorable v0.1.15 // indirect
+	github.com/mattn/go-colorable v0.1.16 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
